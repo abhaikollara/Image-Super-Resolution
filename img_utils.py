@@ -281,19 +281,12 @@ def smooth_gan_labels(y):
 
 
 if __name__ == "__main__":
-    # Transform the images once, then run the main code to scale images
 
-    # Change scaling factor to increase the scaling factor
     scaling_factor = 2
 
-    # Set true_upscale to True to generate smaller training images that will then be true upscaled.
-    # Leave as false to create same size input and output images
     true_upscale = True
 
-    # transform_images_temp(input_path, output_path, scaling_factor=scaling_factor, max_nb_images=-1,
-    #                  true_upscale=true_upscale)
     transform_images_temp(validation_set5_path, validation_output_path, scaling_factor=scaling_factor, max_nb_images=-1,
                      true_upscale=true_upscale)
-    # transform_images_temp(validation_set14_path, validation_output_path, scaling_factor=scaling_factor, max_nb_images=-1,
-    #                       true_upscale=true_upscale)
+
     pass
