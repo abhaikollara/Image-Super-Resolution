@@ -13,3 +13,5 @@ def sr():
     sr_image = main.web_request(image)
     data = {'image': sr_image}
     return jsonify(data)
+
+app.run()
