@@ -60,12 +60,6 @@ def transform_images_temp(directory, output_directory, scaling_factor=2, max_nb_
         assert max_nb_images <= nb_images, "Max number of images must be less than number of images in path"
         print("Transforming %d images." % (nb_images))
 
-    if nb_images == 0:
-        print("Extract the training images or images from imageset_91.zip (found in the releases of the project) "
-              "into a directory with the name 'input_images'")
-        print("Extract the validation images or images from set5_validation.zip (found in the releases of the project) "
-              "into a directory with the name 'val_images'")
-        exit()
 
     for file in os.listdir(directory):
         img = imread(directory + file, mode='RGB')

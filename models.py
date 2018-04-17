@@ -96,22 +96,12 @@ class BaseSuperResolutionModel(object):
         val_count = img_utils.val_image_count()
         if self.model == None: self.create_model(batch_size=batch_size)
 
-        callback_list = [callbacks.ModelCheckpoint(self.weight_path, monitor='val_PSNRLoss', save_best_only=True,
-                                                   mode='max', save_weights_only=True, verbose=2)]
-        if save_history:
-            callback_list.append(HistoryCheckpoint(history_fn))
-
-            if K.backend() == 'tensorflow':
-                log_dir = './%s_logs/' % self.model_name
-                tensorboard = TensorBoardBatch(log_dir, batch_size=batch_size)
-                callback_list.append(tensorboard)
-
         print("Training model : %s" % (self.__class__.__name__))
         self.model.fit_generator(img_utils.image_generator(train_path, scale_factor=self.scale_factor,
                                                            small_train_images=self.type_true_upscaling,
                                                            batch_size=batch_size),
                                  steps_per_epoch=samples_per_epoch // batch_size + 1,
-                                 epochs=nb_epochs, callbacks=callback_list,
+                                 epochs=nb_epochs, callbacks=None,
                                  validation_data=img_utils.image_generator(validation_path,
                                                                            scale_factor=self.scale_factor,
                                                                            small_train_images=self.type_true_upscaling,
@@ -151,15 +141,13 @@ class BaseSuperResolutionModel(object):
         scale_factor = int(self.scale_factor)
         true_img = imread(img_path, mode='RGB')
         init_dim_1, init_dim_2 = true_img.shape[0], true_img.shape[1]
-        if verbose: print("Old Size : ", true_img.shape)
-        if verbose: print("New Size : (%d, %d, 3)" % (init_dim_1 * scale_factor, init_dim_2 * scale_factor))
+
 
         img_dim_1, img_dim_2 = 0, 0
 
         if mode == "patch" and self.type_true_upscaling:
             # Overriding mode for True Upscaling models
             mode = 'fast'
-            print("Patch mode does not work with True Upscaling models yet. Defaulting to mode='fast'")
 
         if mode == 'patch':
             # Create patches
@@ -183,18 +171,11 @@ class BaseSuperResolutionModel(object):
             print("Image is reshaped to : (%d, %d, %d)" % (images.shape[1], images.shape[2], images.shape[3]))
 
         # Save intermediate bilinear scaled image is needed for comparison.
-        intermediate_img = None
-        if save_intermediate:
-            if verbose: print("Saving intermediate image.")
-            fn = path[0] + "_intermediate_" + path[1]
-            intermediate_img = imresize(true_img, (init_dim_1 * scale_factor, init_dim_2 * scale_factor))
-            imsave(fn, intermediate_img)
+        fn = path[0] + "_intermediate_" + path[1]
+        intermediate_img = imresize(true_img, (init_dim_1 * scale_factor, init_dim_2 * scale_factor))
+        imsave(fn, intermediate_img)
 
-        # Transpose and Process images
-        if K.image_dim_ordering() == "th":
-            img_conv = images.transpose((0, 3, 1, 2)).astype(np.float32) / 255.
-        else:
-            img_conv = images.astype(np.float32) / 255.
+        img_conv = images.astype(np.float32) / 255.
 
         model = self.create_model(img_dim_2, img_dim_1, load_weights=True)
         if verbose: print("Model loaded.")
