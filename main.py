@@ -18,12 +18,14 @@ def super_resolve(path):
 
 
 def web_request(base64_img):
-    with open('input_image', 'wb') as f:
-        f.write(base64.decodebytes(base64_img))
+    image = base64_img.split(',')[1].encode()
 
-    super_resolve("input_image")
+    with open("input_image.png","wb") as f:
+        f.write(base64.decodebytes(image))
+        
+    super_resolve("input_image.png")
 
-    with open("input_image_scaled(2x)", "rb") as f:
+    with open("input_image_scaled(2x).png", "rb") as f:
         encoded_string = base64.b64encode(f.read())
 
     return encoded_string
